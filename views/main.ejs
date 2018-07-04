@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel='stylesheet' href='/style.css'>
+    <script>
+    function Add(account) {
+        var item = document.getElementById("item").value;
+        var amount = document.getElementById("amount").value;
+        window.location.href = "/add?account=" + account + "&item=" + item + "&amount=" + amount;
+    }
+
+    function Delete(id, account) {
+        var rs = confirm('Confirm to delete?');
+        if (rs) {
+            window.location.href = "/delete?id=" + id + "&account=" + account;
+        }
+    }
+
+    function Edit(account, id) {
+        var edit = document.getElementById("edit" + id).value;
+        window.location.href = "/update?account=" + account + "&id=" + id + "&amount=" + edit;
+    }
+
+    function Logout() {
+        window.location.href = "/";
+    }
+    </script>
+</head>
+
+<body>
+    <div class="container2">
+        <h1><u>Personal Database</u></h1>
+        <h2>User：<%= user  %></h2>
+        <br>
+        <h2>Adding Item</h2>
+        <div>
+            <input type="text" id="item">
+            <input type="text" id="amount">
+            <input class="btn" type='submit' value='Add' onclick="Add('<%= user  %>');">
+        </div>
+        <br>
+        <h2>Content</h2>
+        <table class="table">
+            <tr>
+                <th>item</th>
+                <th>amount</th>
+            </tr>
+            <% for ( var i = 0 ; i < data.length ; i++){ %>
+                <tr>
+                    <td>
+                        <%= data[i][1]  %>
+                    </td>
+                    <td>
+                        <%= data[i][2]  %>
+                    </td>
+                    <td>
+                        <input type="text" id="edit<%= data[i][0]  %>">
+                    </td>
+                    <td>
+                        <input type="button" name="edit" value="Edit" class="btn" onclick="Edit('<%= user  %>', '<%= data[i][0]  %>');">
+                        <input type="button" name="delete" value="Delete" class="btn" onclick="Delete('<%= data[i][0]  %>', '<%= user  %>');">
+                    </td>
+                </tr>
+                <% } %>
+        </table>
+        <br>
+        <br>
+        <input type="button" value="logout" class="btn2" onclick="Logout()">
+        <br><br>
+    </div>
+</body>
+
+</html>
