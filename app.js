@@ -2,28 +2,46 @@ var express = require('express');
 var app = express();
 var path  = require("path");
 var exec = require('child_process').exec;
+const bodyParser = require("body-parser");
 
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+app.use(bodyParser.json());
 app.use(express.static("styles"));
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
-  //res.sendFile(path.join(__dirname+'/index.html'));
-  res.render('index', { title: 'Login'});
+  res.render('index', { title: 'Login', message: ''});
 });
 
-app.get('/login', function(req, res) {
-	var account = req.query.account;
-	var password = req.query.password;
+app.post('/login', function(req, res) {
+	var account = req.body.account;
+	var password = req.body.password;
+	if(account.length < 3 || password.length < 3) res.render('index', { title: 'Login', message: 'Account or Passwrod too short.'});
 	var child = exec('java -cp ".:./h2.jar" h2db login ' + account, function (error, stdout, stderr){
-		if(stdout != password) res.redirect('/');
-		else res.redirect('/show?account=' + account);
+		if(stdout.length == 0) res.render('index', { title: 'Login', message: 'Account does not exist.'});
+		else if(stdout != password) res.render('index', { title: 'Login', message: 'Wrong password.'});
+		else res.redirect(307, '/show');
 	});
 });
 
-app.get('/show', function(req, res, next) {
+app.get('/register', function(req, res) {
 	var account = req.query.account;
+	var password = req.query.password;
+	if(account.length < 3 || password.length < 3) res.render('index', { title: 'Login', message: 'Account or Passwrod too short.'});
+	else{
+		var child = exec('java -cp ".:./h2.jar" h2db register ' + account + ' ' + password, function (error, stdout, stderr){
+			if(stdout == 'used') res.render('index', { title: 'Login', message: 'Account already exists.'});
+			else res.redirect('/');
+		});
+	}
+});
+
+app.post('/show', function(req, res, next) {
+	var account = req.body.account;
 	var child = exec('java -cp ".:./h2.jar" h2db load ' + account, function (error, stdout, stderr){
 		var data = [];
 		row = stdout.split(";");
@@ -36,29 +54,29 @@ app.get('/show', function(req, res, next) {
 	});
 });
 
-app.get('/delete', function(req, res, next) {
-	var id = req.query.id;
-	var account = req.query.account;
+app.post('/delete', function(req, res, next) {
+	var id = req.body.id;
+	var account = req.body.account;
 	var child = exec('java -cp ".:./h2.jar" h2db delete ' + id, function (error, stdout, stderr){
-		res.redirect('/show?account=' + account);
+		res.redirect(307, '/show');
 	});
 });
 
-app.get('/add', function(req, res, next) {
-	var account = req.query.account;
-	var item = req.query.item;
-	var amount = req.query.amount;
+app.post('/add', function(req, res, next) {
+	var account = req.body.account;
+	var item = req.body.item;
+	var amount = req.body.amount;
 	var child = exec('java -cp ".:./h2.jar" h2db add ' + account + ' ' + item + ' ' + amount, function (error, stdout, stderr){
-		res.redirect('/show?account=' + account);
+		res.redirect(307, '/show');
 	});
 });
 
-app.get('/update', function(req, res, next) {
-	var account = req.query.account;
-	var id = req.query.id;
-	var amount = req.query.amount;
+app.post('/update', function(req, res, next) {
+	var account = req.body.account;
+	var id = req.body.id;
+	var amount = req.body.amount;
 	var child = exec('java -cp ".:./h2.jar" h2db update ' + amount + ' ' + id, function (error, stdout, stderr){
-		res.redirect('/show?account=' + account);
+		res.redirect(307, '/show');
 	});
 });
 

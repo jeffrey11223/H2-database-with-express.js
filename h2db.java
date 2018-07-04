@@ -6,12 +6,22 @@ public class h2db {
         Statement stmt = conn.createStatement();
         ResultSet rs;
 
+        stmt.execute("CREATE TABLE IF NOT EXISTS DATA(ID INT NOT NULL AUTO_INCREMENT, OWNER VARCHAR(255), ITEM VARCHAR(255), AMOUNT INT)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS USER(ACCOUNT VARCHAR(255), PASSWORD VARCHAR(255))");
+
+
         switch(a[0]){
             case "login":
                 rs = stmt.executeQuery("SELECT * FROM USER WHERE ACCOUNT = '" + a[1] + "'");
                 while (rs.next()) {
                   System.out.print(rs.getString("PASSWORD"));
                 }
+                break;
+            case "register":
+                rs = stmt.executeQuery("SELECT * FROM USER WHERE ACCOUNT = '" + a[1] + "'");
+                if (!rs.next()){
+                    stmt.execute("INSERT INTO USER(ACCOUNT, PASSWORD) VALUES('" + a[1] + "','" + a[2] + "')");
+                }else System.out.print("used");
                 break;
             case "load":
                 rs = stmt.executeQuery("SELECT * FROM DATA WHERE OWNER = '" + a[1] + "'");

@@ -5,17 +5,26 @@
         <%= title %>
     </title>
     <link rel='stylesheet' href='/style.css'>
+    <script>
+    function Register() {
+        var account = document.getElementById("account").value;
+        var password = document.getElementById("password").value;
+        window.location.href = "/register?account=" + account + "&password=" + password;
+    }
+    </script>
 </head>
 <body>
     <div class="container">
         <div class="form">
-            <h1><u>LOGIN</u></h1>
-            <form name="login" action="login" method="get">
-                Account    <input name="account" type="text"><br>
-                Password  <input name="password" type="password"><br><br>
+            <h1><u>H2 database</u></h1>
+            <form name="login" action="login" method="post">
+                Account    <input id="account" name="account" type="text"><br>
+                Password  <input id="password" name="password" type="password"><br><br>
                 <input name="submit" type="submit" value="Login" class="btn"/>
+                <input name="register" type="button" value="Register" class="btn" onclick="Register()"/>
             </form>
         </div>
+        <p style="color:red;"><%= message %><p>
     <div>
 </body>
 </html>

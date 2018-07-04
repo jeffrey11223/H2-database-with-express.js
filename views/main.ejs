@@ -7,22 +7,9 @@
     </title>
     <link rel='stylesheet' href='/style.css'>
     <script>
-    function Add(account) {
-        var item = document.getElementById("item").value;
-        var amount = document.getElementById("amount").value;
-        window.location.href = "/add?account=" + account + "&item=" + item + "&amount=" + amount;
-    }
-
-    function Delete(id, account) {
+    function Delete() {
         var rs = confirm('Confirm to delete?');
-        if (rs) {
-            window.location.href = "/delete?id=" + id + "&account=" + account;
-        }
-    }
-
-    function Edit(account, id) {
-        var edit = document.getElementById("edit" + id).value;
-        window.location.href = "/update?account=" + account + "&id=" + id + "&amount=" + edit;
+        if (!rs) return false;
     }
 
     function Logout() {
@@ -37,11 +24,12 @@
         <h2>User：<%= user  %></h2>
         <br>
         <h2>Adding Item</h2>
-        <div>
-            <input type="text" id="item">
-            <input type="text" id="amount">
-            <input class="btn" type='submit' value='Add' onclick="Add('<%= user  %>');">
-        </div>
+        <form action="add" method="post">
+            <input type="hidden" name="account" value="<%= user  %>" >
+            <input type="text" name="item">
+            <input type="text" name="amount">
+            <input class="btn" type='submit' value='Add'>
+        </form>
         <br>
         <h2>Content</h2>
         <table class="table">
@@ -57,13 +45,21 @@
                     <td>
                         <%= data[i][2]  %>
                     </td>
-                    <td>
-                        <input type="text" id="edit<%= data[i][0]  %>">
-                    </td>
-                    <td>
-                        <input type="button" name="edit" value="Edit" class="btn" onclick="Edit('<%= user  %>', '<%= data[i][0]  %>');">
-                        <input type="button" name="delete" value="Delete" class="btn" onclick="Delete('<%= data[i][0]  %>', '<%= user  %>');">
-                    </td>
+                    <form action="update" method="post">
+                        <td>
+                            <input type="hidden" name="account" value="<%= user  %>" >
+                            <input type="hidden" name="id" value="<%= data[i][0]  %>" >
+                            <input type="text" name="amount">
+                            <input type="submit" name="edit" value="Edit" class="btn">
+                        </td>
+                    </form>
+                    <form action="delete" method="post">
+                        <td>
+                            <input type="hidden" name="account" value="<%= user  %>" >
+                            <input type="hidden" name="id" value="<%= data[i][0]  %>" >
+                            <input type="submit" name="delete" value="Delete" class="btn" onclick=" return Delete();">
+                        </td>
+                    </form>
                 </tr>
                 <% } %>
         </table>
